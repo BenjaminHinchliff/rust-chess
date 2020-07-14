@@ -50,24 +50,24 @@ impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "┏{}━━━┓\n{}",
-            "━━━┳".repeat(BOARD_SIZE - 1),
+            "┏{}━━━━┓\n{}",
+            "━━━━┳".repeat(BOARD_SIZE - 1),
             (|| {
                 let mut out = String::new();
                 for (y, row) in self.inner.iter().enumerate() {
                     out += "┃";
                     for piece in row {
                         if let Some(c) = piece {
-                            out += &format!(" {} ┃", c);
+                            out += &format!(" {}  ┃", c);
                         } else {
-                            out += "   ┃";
+                            out += "    ┃";
                         }
                     }
                     out += "\n";
                     if y < self.inner.len() - 1 {
-                        out += &format!("┣{}━━━┫", "━━━╋".repeat(BOARD_SIZE - 1));
+                        out += &format!("┣{}━━━━┫", "━━━━╋".repeat(BOARD_SIZE - 1));
                     } else {
-                        out += &format!("┗{}━━━┛", "━━━┻".repeat(BOARD_SIZE - 1));
+                        out += &format!("┗{}━━━━┛", "━━━━┻".repeat(BOARD_SIZE - 1));
                     }
                     out += "\n";
                 }
