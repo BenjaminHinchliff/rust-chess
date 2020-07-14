@@ -1,3 +1,8 @@
+mod board;
+mod piece;
+
+use board::Board;
+
 fn main() {
-    println!("Hello, world!");
+    let _board = Board::new();
 }
