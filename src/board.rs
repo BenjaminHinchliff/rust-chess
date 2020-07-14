@@ -4,7 +4,10 @@ use crate::{
     utils,
 };
 
-use std::fmt;
+use std::{
+    fmt,
+    char,
+};
 
 pub const BOARD_SIZE: usize = 8;
 type BoardType = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
@@ -117,12 +120,12 @@ impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "┏{}━━━━┓\n{}",
+            "  ┏{}━━━━┓\n{}",
             "━━━━┳".repeat(BOARD_SIZE - 1),
             {
                 let mut out = String::new();
                 for (y, row) in self.inner.iter().enumerate() {
-                    out += "┃";
+                    out += &format!("{} ┃", 8 - y);
                     for piece in row {
                         if let Some(c) = piece {
                             out += &format!(" {}  ┃", c);
@@ -130,12 +133,17 @@ impl fmt::Display for Board {
                             out += "    ┃";
                         }
                     }
-                    out += "\n";
+                    out += "\n  ";
                     if y < self.inner.len() - 1 {
-                        out += &format!("┣{}━━━━┫\n", "━━━━╋".repeat(BOARD_SIZE - 1));
+                        out += &format!("┣{}━━━━┫", "━━━━╋".repeat(BOARD_SIZE - 1));
                     } else {
                         out += &format!("┗{}━━━━┛", "━━━━┻".repeat(BOARD_SIZE - 1));
                     }
+                    out += "\n";
+                }
+                for code in 0..(BOARD_SIZE as u32) {
+                    out += "    ";
+                    out.push(char::from_u32(97 + code).unwrap());
                 }
                 out
             }
