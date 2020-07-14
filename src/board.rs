@@ -52,7 +52,7 @@ impl fmt::Display for Board {
             f,
             "┏{}━━━━┓\n{}",
             "━━━━┳".repeat(BOARD_SIZE - 1),
-            (|| {
+            {
                 let mut out = String::new();
                 for (y, row) in self.inner.iter().enumerate() {
                     out += "┃";
@@ -72,7 +72,7 @@ impl fmt::Display for Board {
                     out += "\n";
                 }
                 out
-            })()
+            }
         )
     }
 }
