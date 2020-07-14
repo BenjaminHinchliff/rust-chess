@@ -4,5 +4,6 @@ mod piece;
 use board::Board;
 
 fn main() {
-    let _board = Board::new();
+    let board = Board::new();
+    println!("{}", board);
 }

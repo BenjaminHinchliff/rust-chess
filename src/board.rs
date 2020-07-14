@@ -1,4 +1,5 @@
-use super::piece::{Color, Piece, Name};
+use super::piece::{Color, Name, Piece};
+use std::fmt;
 
 const BOARD_SIZE: usize = 8;
 type BoardType = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
@@ -45,12 +46,48 @@ impl Board {
     }
 }
 
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "┏{}━━━┓\n{}",
+            "━━━┳".repeat(BOARD_SIZE - 1),
+            (|| {
+                let mut out = String::new();
+                for (y, row) in self.inner.iter().enumerate() {
+                    out += "┃";
+                    for piece in row {
+                        if let Some(c) = piece {
+                            out += &format!(" {} ┃", c);
+                        } else {
+                            out += "   ┃";
+                        }
+                    }
+                    out += "\n";
+                    if y < self.inner.len() - 1 {
+                        out += &format!("┣{}━━━┫", "━━━╋".repeat(BOARD_SIZE - 1));
+                    } else {
+                        out += &format!("┗{}━━━┛", "━━━┻".repeat(BOARD_SIZE - 1));
+                    }
+                    out += "\n";
+                }
+                out
+            })()
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_new() {
-        assert_eq!(Board::new(), Board { inner: DEFAULT_BOARD });
+        assert_eq!(
+            Board::new(),
+            Board {
+                inner: DEFAULT_BOARD
+            }
+        );
     }
 }
