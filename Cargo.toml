@@ -1,5 +1,6 @@
 [package]
-name = "chess"
+name = "cli-chess"
+description = "A cli chess game written in rust. Enter moves in the format [source] => [destination]"
 version = "0.1.0"
 authors = ["SuniTheFish <benjamin.hinchliff@gmail.com>"]
 edition = "2018"
@@ -7,3 +8,4 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = "2.33.1"

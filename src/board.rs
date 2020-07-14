@@ -1,5 +1,9 @@
-use crate::piece::{Color, Names, Piece};
-use crate::utils::clamp;
+use crate::{
+    an,
+    piece::{Color, Names, Piece},
+    utils,
+};
+
 use std::fmt;
 
 pub const BOARD_SIZE: usize = 8;
@@ -40,6 +44,13 @@ pub enum MoveErrors {
     InvalidMove,
     NoPiece,
     Collision,
+    Parse(an::Errors),
+}
+
+impl From<an::Errors> for MoveErrors {
+    fn from(error: an::Errors) -> Self {
+        MoveErrors::Parse(error)
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -52,6 +63,10 @@ impl Board {
         Board {
             inner: DEFAULT_BOARD,
         }
+    }
+
+    pub fn move_piece_an(&mut self, source: &str, destination: &str) -> Result<(), MoveErrors> {
+        self.move_piece(an::an_to_coord(source)?, an::an_to_coord(destination)?)
     }
 
     pub fn move_piece(
@@ -82,8 +97,8 @@ impl Board {
 
     fn collides_on_move(&self, source: (i32, i32), destination: (i32, i32)) -> bool {
         let (dx, dy) = (
-            clamp(destination.0 - source.0, -1, 1),
-            clamp(destination.1 - source.1, -1, 1),
+            utils::clamp(destination.0 - source.0, -1, 1),
+            utils::clamp(destination.1 - source.1, -1, 1),
         );
         let (dest_x, dest_y) = destination;
         let (mut cx, mut cy) = source;

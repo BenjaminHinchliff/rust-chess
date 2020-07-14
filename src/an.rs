@@ -8,7 +8,7 @@ pub enum Errors {
 /// Converts chess algebraic notation to a coord
 /// # Arguments
 /// * `an` - the string of algebraic notation e.g. 'g5'
-pub fn an_to_coord(an: &str) -> Result<(usize, usize), Errors> {
+pub fn an_to_coord(an: &str) -> Result<(i32, i32), Errors> {
     let lower = an.to_lowercase();
     let mut iter = lower.chars();
     let first = match iter.next() {
@@ -19,7 +19,7 @@ pub fn an_to_coord(an: &str) -> Result<(usize, usize), Errors> {
         Some(last) if last.is_numeric() => last,
         _ => return Err(Errors::NonNumericLastChar),
     };
-    Ok((first as usize - 97, 8 - last.to_digit(10).unwrap() as usize))
+    Ok((first as i32 - 97, 8 - last.to_digit(10).unwrap() as i32))
 }
 
 #[cfg(test)]
