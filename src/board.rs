@@ -4,6 +4,7 @@ use crate::{
     utils,
 };
 
+use std::collections::HashMap;
 use std::{char, fmt};
 
 pub const BOARD_SIZE: usize = 8;
@@ -42,8 +43,10 @@ const DEFAULT_BOARD: BoardType = [
 pub enum MoveErrors {
     NotOnBoard,
     InvalidMove,
+    InvalidCapture,
     NoPiece,
     Collision,
+    NoSelfCapture,
     Parse(an::Errors),
 }
 
@@ -53,15 +56,28 @@ impl From<an::Errors> for MoveErrors {
     }
 }
 
+fn pieces_to_string(pieces: &[Piece]) -> String {
+    pieces
+        .iter()
+        .map(|p| format!("{}", p))
+        .collect::<Vec<String>>()
+        .join(",")
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Board {
     inner: BoardType,
+    captures: HashMap<Color, Vec<Piece>>,
 }
 
 impl Board {
-    pub const fn new() -> Board {
+    pub fn new() -> Board {
         Board {
             inner: DEFAULT_BOARD,
+            captures: [Color::White, Color::Black]
+                .iter()
+                .map(|&color| (color, Vec::new()))
+                .collect(),
         }
     }
 
@@ -77,19 +93,35 @@ impl Board {
         let (x, y) = source;
         let (ux, uy) = (x as usize, y as usize);
         let (dest_x, dest_y) = destination;
-        let piece = match self.inner[uy][ux] {
+        let (dest_ux, dest_uy) = (dest_x as usize, dest_y as usize);
+        let mut piece = match self.inner[uy][ux] {
             Some(piece) => piece,
             None => return Err(MoveErrors::NoPiece),
         };
         if dest_x < 0 || dest_x >= BOARD_SIZE as i32 || dest_y < 0 || dest_y >= BOARD_SIZE as i32 {
             return Err(MoveErrors::NotOnBoard);
         }
-        if !piece.is_move_valid(source, destination) {
-            return Err(MoveErrors::InvalidMove);
-        }
         if piece.name() != Name::Knight && self.collides_on_move(source, destination) {
             return Err(MoveErrors::Collision);
         }
+        if let Some(dest_piece) = self.inner[dest_uy][dest_ux] {
+            if dest_piece.color() == piece.color() {
+                return Err(MoveErrors::NoSelfCapture);
+            }
+            if piece.is_capture_valid(source, destination) {
+                self.captures
+                    .get_mut(&!piece.color())
+                    .unwrap()
+                    .push(dest_piece);
+            } else {
+                return Err(MoveErrors::InvalidCapture);
+            }
+        } else {
+            if !piece.is_move_valid(source, destination) {
+                return Err(MoveErrors::InvalidMove);
+            }
+        }
+        piece.has_moved = true;
         self.inner[uy][ux] = None;
         self.inner[dest_y as usize][dest_x as usize] = Some(piece);
         Ok(())
@@ -109,12 +141,14 @@ impl Board {
         );
         let (dest_x, dest_y) = destination;
         let (mut cx, mut cy) = source;
+        cx += dx;
+        cy += dy;
         while cx != dest_x || cy != dest_y {
-            cx += dx;
-            cy += dy;
             if self.inner[cy as usize][cx as usize].is_some() {
                 return true;
             }
+            cx += dx;
+            cy += dy;
         }
         false
     }
@@ -132,7 +166,7 @@ impl fmt::Display for Board {
                     out += &format!("{} ┃", 8 - y);
                     for piece in row {
                         if let Some(c) = piece {
-                            out += &format!(" {}  ┃", c);
+                            out += &format!(" {} ┃", c);
                         } else {
                             out += "    ┃";
                         }
@@ -149,6 +183,12 @@ impl fmt::Display for Board {
                     out += "    ";
                     out.push(char::from_u32(97 + code).unwrap());
                 }
+                out += "\n";
+                out += &format!(
+                    "    White: {}  Black: {}",
+                    pieces_to_string(&self.captures[&Color::White]),
+                    pieces_to_string(&self.captures[&Color::Black])
+                );
                 out
             }
         )
@@ -164,7 +204,11 @@ mod tests {
         assert_eq!(
             Board::new(),
             Board {
-                inner: DEFAULT_BOARD
+                inner: DEFAULT_BOARD,
+                captures: [(Color::White, Vec::new()), (Color::Black, Vec::new())]
+                    .iter()
+                    .cloned()
+                    .collect(),
             }
         );
     }
