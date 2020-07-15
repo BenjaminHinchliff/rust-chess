@@ -1,43 +1,40 @@
 use crate::{
     an,
-    piece::{Color, Names, Piece},
+    piece::{Color, Name, Piece},
     utils,
 };
 
-use std::{
-    fmt,
-    char,
-};
+use std::{char, fmt, option};
 
 pub const BOARD_SIZE: usize = 8;
 type BoardType = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
 
 const DEFAULT_BOARD: BoardType = [
     [
-        Some(Piece::new(Names::Rook, Color::Black)),
-        Some(Piece::new(Names::Knight, Color::Black)),
-        Some(Piece::new(Names::Bishop, Color::Black)),
-        Some(Piece::new(Names::Queen, Color::Black)),
-        Some(Piece::new(Names::King, Color::Black)),
-        Some(Piece::new(Names::Bishop, Color::Black)),
-        Some(Piece::new(Names::Knight, Color::Black)),
-        Some(Piece::new(Names::Rook, Color::Black)),
+        Some(Piece::new(Name::Rook, Color::Black)),
+        Some(Piece::new(Name::Knight, Color::Black)),
+        Some(Piece::new(Name::Bishop, Color::Black)),
+        Some(Piece::new(Name::Queen, Color::Black)),
+        Some(Piece::new(Name::King, Color::Black)),
+        Some(Piece::new(Name::Bishop, Color::Black)),
+        Some(Piece::new(Name::Knight, Color::Black)),
+        Some(Piece::new(Name::Rook, Color::Black)),
     ],
-    [Some(Piece::new(Names::Pawn, Color::Black)); BOARD_SIZE],
+    [Some(Piece::new(Name::Pawn, Color::Black)); BOARD_SIZE],
     [None; BOARD_SIZE],
     [None; BOARD_SIZE],
     [None; BOARD_SIZE],
     [None; BOARD_SIZE],
-    [Some(Piece::new(Names::Pawn, Color::White)); BOARD_SIZE],
+    [Some(Piece::new(Name::Pawn, Color::White)); BOARD_SIZE],
     [
-        Some(Piece::new(Names::Rook, Color::White)),
-        Some(Piece::new(Names::Knight, Color::White)),
-        Some(Piece::new(Names::Bishop, Color::White)),
-        Some(Piece::new(Names::Queen, Color::White)),
-        Some(Piece::new(Names::King, Color::White)),
-        Some(Piece::new(Names::Bishop, Color::White)),
-        Some(Piece::new(Names::Knight, Color::White)),
-        Some(Piece::new(Names::Rook, Color::White)),
+        Some(Piece::new(Name::Rook, Color::White)),
+        Some(Piece::new(Name::Knight, Color::White)),
+        Some(Piece::new(Name::Bishop, Color::White)),
+        Some(Piece::new(Name::Queen, Color::White)),
+        Some(Piece::new(Name::King, Color::White)),
+        Some(Piece::new(Name::Bishop, Color::White)),
+        Some(Piece::new(Name::Knight, Color::White)),
+        Some(Piece::new(Name::Rook, Color::White)),
     ],
 ];
 
@@ -90,12 +87,19 @@ impl Board {
         if !piece.is_move_valid(source, destination) {
             return Err(MoveErrors::InvalidMove);
         }
-        if piece.name() != Names::Knight && self.collides_on_move(source, destination) {
+        if piece.name() != Name::Knight && self.collides_on_move(source, destination) {
             return Err(MoveErrors::Collision);
         }
         self.inner[uy][ux] = None;
         self.inner[dest_y as usize][dest_x as usize] = Some(piece);
         Ok(())
+    }
+
+    pub fn get_piece_color(&self, source: &str) -> Result<Color, MoveErrors> {
+        let (x, y) = an::an_to_coord(source).map_err(|err| MoveErrors::Parse(err))?;
+        Ok(self.inner[y as usize][x as usize]
+            .ok_or_else(|| MoveErrors::NoPiece)?
+            .color())
     }
 
     fn collides_on_move(&self, source: (i32, i32), destination: (i32, i32)) -> bool {

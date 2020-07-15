@@ -7,7 +7,7 @@ pub enum Color {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub enum Names {
+pub enum Name {
     King,
     Queen,
     Rook,
@@ -31,13 +31,13 @@ pub enum Movement<'a> {
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Piece {
-    piece_type: Names,
+    name: Name,
     color: Color,
 }
 
 impl Piece {
-    pub const fn new(piece_type: Names, color: Color) -> Piece {
-        Piece { piece_type, color }
+    pub const fn new(name: Name, color: Color) -> Piece {
+        Piece { name, color }
     }
 
     pub fn is_move_valid(&self, source: (i32, i32), destination: (i32, i32)) -> bool {
@@ -67,9 +67,9 @@ impl Piece {
     }
 
     pub fn movement(&self) -> Movement {
-        match self.piece_type {
+        match self.name {
             // movement 1 space in any direction
-            Names::King => Movement::Tuples(&[
+            Name::King => Movement::Tuples(&[
                 (0, -1),
                 (1, -1),
                 (1, 0),
@@ -79,10 +79,10 @@ impl Piece {
                 (-1, 0),
                 (-1, -1),
             ]),
-            Names::Queen => Movement::Directions(&[Direction::Horizontal, Direction::Diagonal]),
-            Names::Bishop => Movement::Directions(&[Direction::Diagonal]),
+            Name::Queen => Movement::Directions(&[Direction::Horizontal, Direction::Diagonal]),
+            Name::Bishop => Movement::Directions(&[Direction::Diagonal]),
             // just google this if you don't know it
-            Names::Knight => Movement::Tuples(&[
+            Name::Knight => Movement::Tuples(&[
                 (1, -2),
                 (2, -1),
                 (2, 1),
@@ -92,13 +92,17 @@ impl Piece {
                 (-2, -1),
                 (-1, -2),
             ]),
-            Names::Rook => Movement::Directions(&[Direction::Horizontal]),
-            Names::Pawn => Movement::Tuples(&[(0, 1)]),
+            Name::Rook => Movement::Directions(&[Direction::Horizontal]),
+            Name::Pawn => Movement::Tuples(&[(0, 1)]),
         }
     }
 
-    pub fn name(&self) -> Names {
-        self.piece_type
+    pub fn name(&self) -> Name {
+        self.name
+    }
+
+    pub fn color(&self) -> Color {
+        self.color
     }
 }
 
@@ -108,21 +112,21 @@ impl fmt::Display for Piece {
             f,
             "{}",
             match self.color {
-                Color::White => match self.piece_type {
-                    Names::King => '♔',
-                    Names::Queen => '♕',
-                    Names::Rook => '♖',
-                    Names::Bishop => '♗',
-                    Names::Knight => '♘',
-                    Names::Pawn => '♙',
+                Color::White => match self.name {
+                    Name::King => '♔',
+                    Name::Queen => '♕',
+                    Name::Rook => '♖',
+                    Name::Bishop => '♗',
+                    Name::Knight => '♘',
+                    Name::Pawn => '♙',
                 },
-                Color::Black => match self.piece_type {
-                    Names::King => '♚',
-                    Names::Queen => '♛',
-                    Names::Rook => '♜',
-                    Names::Bishop => '♝',
-                    Names::Knight => '♞',
-                    Names::Pawn => '♟',
+                Color::Black => match self.name {
+                    Name::King => '♚',
+                    Name::Queen => '♛',
+                    Name::Rook => '♜',
+                    Name::Bishop => '♝',
+                    Name::Knight => '♞',
+                    Name::Pawn => '♟',
                 },
             }
         )
@@ -136,21 +140,21 @@ mod tests {
     #[test]
     fn test_new() {
         assert_eq!(
-            Piece::new(Names::King, Color::White),
+            Piece::new(Name::King, Color::White),
             Piece {
-                piece_type: Names::King,
+                name: Name::King,
                 color: Color::White
             }
         );
     }
     #[test]
     fn test_is_move_valid() {
-        assert!(Piece::new(Names::Pawn, Color::Black).is_move_valid((0, 0), (0, 1)));
-        assert!(Piece::new(Names::Pawn, Color::White).is_move_valid((0, 1), (0, 0)));
-        let white_bishop = Piece::new(Names::Bishop, Color::Black);
+        assert!(Piece::new(Name::Pawn, Color::Black).is_move_valid((0, 0), (0, 1)));
+        assert!(Piece::new(Name::Pawn, Color::White).is_move_valid((0, 1), (0, 0)));
+        let white_bishop = Piece::new(Name::Bishop, Color::Black);
         assert!(white_bishop.is_move_valid((0, 1), (5, 6)));
         assert!(!white_bishop.is_move_valid((0, 1), (0, 6)));
-        let white_rook = Piece::new(Names::Rook, Color::White);
+        let white_rook = Piece::new(Name::Rook, Color::White);
         assert!(white_rook.is_move_valid((0, 0), (10, 0)));
         assert!(!white_rook.is_move_valid((0, 0), (5, 5)));
     }
