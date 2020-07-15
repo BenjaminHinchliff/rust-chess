@@ -6,24 +6,16 @@ A 2 player cli based chess game written in Rust.
 
 ### UTF-8 Mode
 
-```bash
-./cli-chess
-```
+`./cli-chess`
 
 ### ACSII Mode
 
-```bash
-./cli-chess --acsii
-```
+`./cli-chess --acsii`
 
 ## Compilation
 
-```bash
-cargo build
-```
+`cargo build`
 
 ## Testing
 
-```bash
-cargo test
-```
+`cargo test`
