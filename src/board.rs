@@ -4,7 +4,7 @@ use crate::{
     utils,
 };
 
-use std::{char, fmt, option};
+use std::{char, fmt};
 
 pub const BOARD_SIZE: usize = 8;
 type BoardType = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];

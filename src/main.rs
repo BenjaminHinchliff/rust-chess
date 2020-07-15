@@ -50,9 +50,11 @@ fn main() {
                     eprintln!("Invalid piece: {:?}", err);
                     pause();
                     continue;
-                } 
+                }
             };
-            if white_turn && piece_color == Color::White || !white_turn && piece_color == Color::Black {
+            if white_turn && piece_color == Color::White
+                || !white_turn && piece_color == Color::Black
+            {
                 if let Err(err) = chessboard.move_piece_an(source, destination) {
                     eprintln!("Invalid move: {:?}", err);
                     pause();
