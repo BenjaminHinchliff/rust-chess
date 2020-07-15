@@ -1,6 +1,6 @@
 use crate::{
     an,
-    piece::{Color, Name, Piece},
+    piece::{Color, Name, Piece, TextType},
     utils,
 };
 
@@ -9,35 +9,6 @@ use std::{char, fmt};
 
 pub const BOARD_SIZE: usize = 8;
 type BoardType = [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE];
-
-const DEFAULT_BOARD: BoardType = [
-    [
-        Some(Piece::new(Name::Rook, Color::Black)),
-        Some(Piece::new(Name::Knight, Color::Black)),
-        Some(Piece::new(Name::Bishop, Color::Black)),
-        Some(Piece::new(Name::Queen, Color::Black)),
-        Some(Piece::new(Name::King, Color::Black)),
-        Some(Piece::new(Name::Bishop, Color::Black)),
-        Some(Piece::new(Name::Knight, Color::Black)),
-        Some(Piece::new(Name::Rook, Color::Black)),
-    ],
-    [Some(Piece::new(Name::Pawn, Color::Black)); BOARD_SIZE],
-    [None; BOARD_SIZE],
-    [None; BOARD_SIZE],
-    [None; BOARD_SIZE],
-    [None; BOARD_SIZE],
-    [Some(Piece::new(Name::Pawn, Color::White)); BOARD_SIZE],
-    [
-        Some(Piece::new(Name::Rook, Color::White)),
-        Some(Piece::new(Name::Knight, Color::White)),
-        Some(Piece::new(Name::Bishop, Color::White)),
-        Some(Piece::new(Name::Queen, Color::White)),
-        Some(Piece::new(Name::King, Color::White)),
-        Some(Piece::new(Name::Bishop, Color::White)),
-        Some(Piece::new(Name::Knight, Color::White)),
-        Some(Piece::new(Name::Rook, Color::White)),
-    ],
-];
 
 #[derive(Debug)]
 pub enum MoveErrors {
@@ -71,9 +42,36 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new() -> Board {
+    pub fn new(text_type: TextType) -> Board {
         Board {
-            inner: DEFAULT_BOARD,
+            inner: [
+                [
+                    Some(Piece::new(Name::Rook, Color::Black, text_type)),
+                    Some(Piece::new(Name::Knight, Color::Black, text_type)),
+                    Some(Piece::new(Name::Bishop, Color::Black, text_type)),
+                    Some(Piece::new(Name::Queen, Color::Black, text_type)),
+                    Some(Piece::new(Name::King, Color::Black, text_type)),
+                    Some(Piece::new(Name::Bishop, Color::Black, text_type)),
+                    Some(Piece::new(Name::Knight, Color::Black, text_type)),
+                    Some(Piece::new(Name::Rook, Color::Black, text_type)),
+                ],
+                [Some(Piece::new(Name::Pawn, Color::Black, text_type)); BOARD_SIZE],
+                [None; BOARD_SIZE],
+                [None; BOARD_SIZE],
+                [None; BOARD_SIZE],
+                [None; BOARD_SIZE],
+                [Some(Piece::new(Name::Pawn, Color::White, text_type)); BOARD_SIZE],
+                [
+                    Some(Piece::new(Name::Rook, Color::White, text_type)),
+                    Some(Piece::new(Name::Knight, Color::White, text_type)),
+                    Some(Piece::new(Name::Bishop, Color::White, text_type)),
+                    Some(Piece::new(Name::Queen, Color::White, text_type)),
+                    Some(Piece::new(Name::King, Color::White, text_type)),
+                    Some(Piece::new(Name::Bishop, Color::White, text_type)),
+                    Some(Piece::new(Name::Knight, Color::White, text_type)),
+                    Some(Piece::new(Name::Rook, Color::White, text_type)),
+                ],
+            ],
             captures: [Color::White, Color::Black]
                 .iter()
                 .map(|&color| (color, Vec::new()))
@@ -110,7 +108,7 @@ impl Board {
             }
             if piece.is_capture_valid(source, destination) {
                 self.captures
-                    .get_mut(&!piece.color())
+                    .get_mut(&!dest_piece.color())
                     .unwrap()
                     .push(dest_piece);
             } else {
@@ -185,7 +183,7 @@ impl fmt::Display for Board {
                 }
                 out += "\n";
                 out += &format!(
-                    "    White: {}  Black: {}",
+                    "   White: {}  Black: {}",
                     pieces_to_string(&self.captures[&Color::White]),
                     pieces_to_string(&self.captures[&Color::Black])
                 );
@@ -200,22 +198,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new() {
-        assert_eq!(
-            Board::new(),
-            Board {
-                inner: DEFAULT_BOARD,
-                captures: [(Color::White, Vec::new()), (Color::Black, Vec::new())]
-                    .iter()
-                    .cloned()
-                    .collect(),
-            }
-        );
-    }
-
-    #[test]
     fn test_move_piece() {
-        let mut board = Board::new();
+        let mut board = Board::new(TextType::UTF8);
         assert!(board.move_piece((0, 1), (0, 3)).is_ok());
         assert!(board.move_piece((1, 0), (0, 2)).is_ok());
         assert!(board.move_piece_an("a2", "a4").is_ok());

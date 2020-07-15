@@ -7,7 +7,7 @@ mod piece;
 mod utils;
 
 use board::Board;
-use piece::{Color, Name, Piece};
+use piece::{Color, Name, Piece, TextType};
 use std::io::{self, Write};
 
 fn pause() {
@@ -19,19 +19,21 @@ fn pause() {
 }
 
 fn main() {
-    let _matches = clap_app!((env!("CARGO_PKG_NAME")) =>
+    let matches = clap_app!((env!("CARGO_PKG_NAME")) =>
         (version: env!("CARGO_PKG_VERSION"))
         (author: env!("CARGO_PKG_AUTHORS"))
         (about: env!("CARGO_PKG_DESCRIPTION"))
+        (@arg acsii: -a --acsii "sets mode to use acsii character set")
     )
     .get_matches();
-    let mut chessboard = Board::new();
+    let text_type = if matches.is_present("acsii") { TextType::ACSII } else { TextType::UTF8 };
+    let mut chessboard = Board::new(text_type);
     let mut white_turn = true;
     loop {
         println!(
             "      White: {}  Black: {}  |{}'s Turn|",
-            Piece::new(Name::King, Color::White),
-            Piece::new(Name::King, Color::Black),
+            Piece::new(Name::King, Color::White, text_type),
+            Piece::new(Name::King, Color::Black, text_type),
             if white_turn { "White" } else { "Black" }
         );
         println!("{}", chessboard);

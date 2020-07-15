@@ -48,17 +48,25 @@ pub enum Movement<'a> {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
+pub enum TextType {
+    UTF8,
+    ACSII,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Piece {
     name: Name,
     color: Color,
+    text_type: TextType,
     pub has_moved: bool,
 }
 
 impl Piece {
-    pub const fn new(name: Name, color: Color) -> Piece {
+    pub const fn new(name: Name, color: Color, text_type: TextType) -> Piece {
         Piece {
             name,
             color,
+            text_type,
             has_moved: false,
         }
     }
@@ -160,28 +168,53 @@ impl Piece {
 
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{} ",
-            match self.color {
-                Color::White => match self.name {
-                    Name::King => '♔',
-                    Name::Queen => '♕',
-                    Name::Rook => '♖',
-                    Name::Bishop => '♗',
-                    Name::Knight => '♘',
-                    Name::Pawn => '♙',
-                },
-                Color::Black => match self.name {
-                    Name::King => '♚',
-                    Name::Queen => '♛',
-                    Name::Rook => '♜',
-                    Name::Bishop => '♝',
-                    Name::Knight => '♞',
-                    Name::Pawn => '♟',
-                },
-            }
-        )
+        if self.text_type == TextType::UTF8 {
+            write!(
+                f,
+                "{} ",
+                match self.color {
+                    Color::White => match self.name {
+                        Name::King => '♔',
+                        Name::Queen => '♕',
+                        Name::Rook => '♖',
+                        Name::Bishop => '♗',
+                        Name::Knight => '♘',
+                        Name::Pawn => '♙',
+                    },
+                    Color::Black => match self.name {
+                        Name::King => '♚',
+                        Name::Queen => '♛',
+                        Name::Rook => '♜',
+                        Name::Bishop => '♝',
+                        Name::Knight => '♞',
+                        Name::Pawn => '♟',
+                    },
+                }
+            )
+        } else {
+            write!(
+                f,
+                "{}",
+                match self.color {
+                    Color::White => match self.name {
+                        Name::King => "WK",
+                        Name::Queen => "WQ",
+                        Name::Rook => "WR",
+                        Name::Bishop => "WB",
+                        Name::Knight => "WH",
+                        Name::Pawn => "WP",
+                    },
+                    Color::Black => match self.name {
+                        Name::King => "BK",
+                        Name::Queen => "BQ",
+                        Name::Rook => "BR",
+                        Name::Bishop => "BB",
+                        Name::Knight => "BH",
+                        Name::Pawn => "BP",
+                    },
+                }
+            )
+        }
     }
 }
 
@@ -192,28 +225,29 @@ mod tests {
     #[test]
     fn test_new() {
         assert_eq!(
-            Piece::new(Name::King, Color::White),
+            Piece::new(Name::King, Color::White, TextType::UTF8),
             Piece {
                 name: Name::King,
                 color: Color::White,
+                text_type: TextType::UTF8,
                 has_moved: false,
             }
         );
     }
     #[test]
     fn test_is_move_valid() {
-        assert!(Piece::new(Name::Pawn, Color::Black).is_move_valid((0, 0), (0, 1)));
-        assert!(Piece::new(Name::Pawn, Color::White).is_move_valid((0, 1), (0, 0)));
-        let white_bishop = Piece::new(Name::Bishop, Color::Black);
+        assert!(Piece::new(Name::Pawn, Color::Black, TextType::UTF8).is_move_valid((0, 0), (0, 1)));
+        assert!(Piece::new(Name::Pawn, Color::White, TextType::UTF8).is_move_valid((0, 1), (0, 0)));
+        let white_bishop = Piece::new(Name::Bishop, Color::Black, TextType::UTF8);
         assert!(white_bishop.is_move_valid((0, 1), (5, 6)));
         assert!(!white_bishop.is_move_valid((0, 1), (0, 6)));
-        let white_rook = Piece::new(Name::Rook, Color::White);
+        let white_rook = Piece::new(Name::Rook, Color::White, TextType::UTF8);
         assert!(white_rook.is_move_valid((0, 0), (10, 0)));
         assert!(!white_rook.is_move_valid((0, 0), (5, 5)));
     }
     #[test]
     fn test_is_capture_valid() {
-        assert!(Piece::new(Name::Pawn, Color::White).is_capture_valid((0, 1), (1, 0)));
-        assert!(Piece::new(Name::Pawn, Color::Black).is_capture_valid((0, 1), (1, 2)));
+        assert!(Piece::new(Name::Pawn, Color::White, TextType::UTF8).is_capture_valid((0, 1), (1, 0)));
+        assert!(Piece::new(Name::Pawn, Color::Black, TextType::UTF8).is_capture_valid((0, 1), (1, 2)));
     }
 }
