@@ -42,7 +42,7 @@ fn main() {
             .read_line(&mut line)
             .expect("unable to read line!");
         if let [source, destination] =
-            &line.split("=>").map(|mv| mv.trim()).collect::<Vec<&str>>()[..]
+            &line.split("to").map(|mv| mv.trim()).collect::<Vec<&str>>()[..]
         {
             let piece_color = match chessboard.get_piece_color(source) {
                 Ok(color) => color,

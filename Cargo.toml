@@ -1,6 +1,6 @@
 [package]
 name = "cli-chess"
-description = "A cli chess game written in rust. Enter moves in the format [source] => [destination]"
+description = "A cli chess game written in rust. Enter moves in the format [source] to [destination]"
 version = "0.1.0"
 authors = ["SuniTheFish <benjamin.hinchliff@gmail.com>"]
 edition = "2018"
