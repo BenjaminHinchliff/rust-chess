@@ -212,4 +212,14 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_move_piece() {
+        let mut board = Board::new();
+        assert!(board.move_piece((0, 1), (0, 3)).is_ok());
+        assert!(board.move_piece((1, 0), (0, 2)).is_ok());
+        assert!(board.move_piece_an("a2", "a4").is_ok());
+        assert!(board.move_piece_an("c1", "d2").is_err());
+        assert!(board.move_piece_an("e1", "f1").is_err());
+    }
 }
