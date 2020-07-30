@@ -12,6 +12,9 @@ A 2 player cli based chess game written in Rust.
 
 `./cli-chess --acsii`
 
+### Move Example
+`a2 to a3`
+
 ## Compilation
 
 `cargo build`
